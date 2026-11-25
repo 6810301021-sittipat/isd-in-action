@@ -45,8 +45,11 @@ public class DesignAndOrderTacosBrowserTest {
     clickDesignATaco();
     assertDesignPageElements();
     buildAndSubmitATaco("Basic Taco", "FLTO", "GRBF", "CHED", "TMTO", "SLSA");
-    clickBuildAnotherTaco();
+    assertCartPage();
+    clickDesignAnotherTaco();
     buildAndSubmitATaco("Another Taco", "COTO", "CARN", "JACK", "LETC", "SRCR");
+    assertCartPage();
+    clickProceedToCheckout();
     fillInAndSubmitOrderForm();
     assertThat(browser.getCurrentUrl()).isEqualTo(homePageUrl());
   }
@@ -57,6 +60,8 @@ public class DesignAndOrderTacosBrowserTest {
     clickDesignATaco();
     assertDesignPageElements();
     buildAndSubmitATaco("Basic Taco", "FLTO", "GRBF", "CHED", "TMTO", "SLSA");
+    assertCartPage();
+    clickProceedToCheckout();
     submitEmptyOrderForm();
     fillInAndSubmitOrderForm();
     assertThat(browser.getCurrentUrl()).isEqualTo(homePageUrl());
@@ -68,6 +73,8 @@ public class DesignAndOrderTacosBrowserTest {
     clickDesignATaco();
     assertDesignPageElements();
     buildAndSubmitATaco("Basic Taco", "FLTO", "GRBF", "CHED", "TMTO", "SLSA");
+    assertCartPage();
+    clickProceedToCheckout();
     submitInvalidOrderForm();
     fillInAndSubmitOrderForm();
     assertThat(browser.getCurrentUrl()).isEqualTo(homePageUrl());
@@ -123,6 +130,9 @@ public class DesignAndOrderTacosBrowserTest {
     assertIngredient(sauceGroup, 1, "SRCR", "Sour Cream");
   }
 
+  private void assertCartPage() {
+    assertThat(browser.getCurrentUrl()).isEqualTo(cartPageUrl());
+  }
 
   private void fillInAndSubmitOrderForm() {
     assertThat(browser.getCurrentUrl()).startsWith(orderDetailsPageUrl());
@@ -213,9 +223,14 @@ public class DesignAndOrderTacosBrowserTest {
     browser.findElement(By.cssSelector("a[id='design']")).click();
   }
 
-  private void clickBuildAnotherTaco() {
-    assertThat(browser.getCurrentUrl()).startsWith(orderDetailsPageUrl());
-    browser.findElement(By.cssSelector("a[id='another']")).click();
+  private void clickDesignAnotherTaco() {
+    assertCartPage();
+    browser.findElement(By.partialLinkText("Design Another Taco")).click();
+  }
+
+  private void clickProceedToCheckout() {
+    assertCartPage();
+    browser.findElement(By.partialLinkText("Proceed to Checkout")).click();
   }
 
 
@@ -228,6 +243,10 @@ public class DesignAndOrderTacosBrowserTest {
 
   private String homePageUrl() {
     return "http://localhost:" + port + "/";
+  }
+
+  private String cartPageUrl() {
+    return homePageUrl() + "cart";
   }
 
   private String orderDetailsPageUrl() {
